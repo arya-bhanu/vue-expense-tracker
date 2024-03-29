@@ -21,23 +21,14 @@
 </template>
 <script setup lang="ts">
 import { Currency } from '../enums'
-import { computed } from 'vue'
+import usePickCurrency from '../composables/usePickCurrency'
 export type BalancePropsType = {
   total_income: number
   total_expense: number
   currency: Currency
 }
 const props = defineProps<{ balanceData: BalancePropsType }>()
-const currencySymbol = computed(() => {
-  switch (props.balanceData.currency) {
-    case Currency.IDR:
-      return 'Rp.'
-    case Currency.USD:
-      return '$'
-    default:
-      return 'Rp.'
-  }
-})
+const currencySymbol = usePickCurrency(props.balanceData.currency)
 </script>
 
 <style scoped lang="postcss">
@@ -46,7 +37,7 @@ const currencySymbol = computed(() => {
 }
 
 .box-balance .title {
-  @apply font-semibold text-xl;
+  @apply font-semibold text-2xl;
 }
 
 .box-balance h4.title + span {
