@@ -6,7 +6,11 @@ export const useAuthStore = defineStore('auth', () => {
     const { error, data } = await supabase.auth.signInWithOAuth({ provider: 'google' })
     return { error, data }
   }
-  return { loginUser: signInUser }
+  const getUser = async () => {
+    const { error, data } = await supabase.auth.getUser()
+    return { error, data }
+  }
+  return { signInUser, getUser }
 })
 
 export const useStorageStore = defineStore('storage', () => {
