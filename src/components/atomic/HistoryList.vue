@@ -1,13 +1,13 @@
 <template>
   <li
     :class="
-      historyListData.expensesType === ExpensesType.EXPENSE
+      historyListData.expenses_type === ExpensesType.EXPENSE
         ? ' border-r-red-500'
         : 'border-r-green-500'
     "
     class="flex border-r-8 items-center justify-between px-4 py-5 bg-white shadow-lg"
   >
-    <span>{{ historyListData.titleTransaction }}</span>
+    <span>{{ historyListData.title_transaction }}</span>
     <p>
       <span>{{ currencySymbol }}</span>
       <span>{{ historyListData.amount }}</span>
@@ -16,8 +16,7 @@
 </template>
 <script setup lang="ts">
 import usePickCurrency from '../../composables/usePickCurrency'
-import { ExpensesType } from '@/enums'
-import type { HistoryExpensesPropsType } from '../HistoryExpenses.vue'
-const props = defineProps<{ historyListData: HistoryExpensesPropsType }>()
-const currencySymbol = usePickCurrency(props.historyListData.currencySymbol)
+import { Currency, ExpensesType } from '@/enums'
+const props = defineProps<{ historyListData: any; currency: Currency }>()
+const currencySymbol = usePickCurrency(props.currency)
 </script>

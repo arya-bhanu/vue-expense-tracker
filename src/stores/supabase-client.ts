@@ -61,9 +61,19 @@ export const useTransactionStore = defineStore('transaction', () => {
     })
     return error
   }
-  const selectAllTransaction = async () => {
-    const { data, error } = await supabase.from('transaction_user').select()
-    return { data, error }
+  const selectAllTransaction = async (userRegisteredId: number) => {
+    const { data: rowTransaction, error: errorTransaction } = await supabase
+      .from('transaction_user')
+      .select()
+      .eq('user_data_id', userRegisteredId)
+
+    const { data: sumTransaction, error: errorSumTransaction } = await supabase.rpc(
+      'sum_amount_transaction',
+      {
+        id_input: userRegisteredId
+      }
+    )
+    return { rowTransaction, errorTransaction, sumTransaction, errorSumTransaction }
   }
   return { createTransaction, selectAllTransaction }
 })

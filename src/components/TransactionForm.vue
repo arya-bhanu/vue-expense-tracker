@@ -40,6 +40,7 @@ import { useTransactionStore } from '../stores/supabase-client'
 import { ExpensesType } from '@/enums'
 
 const props = defineProps<{ userRegisteredId: number }>()
+const emits = defineEmits<{ (e: 'refetch'): void }>()
 
 const useTransaction = useTransactionStore()
 
@@ -69,6 +70,7 @@ async function handleFormSubmit() {
         calculateExpenseType.value
       )
       if (error) throw error
+      emits('refetch')
     } catch (err) {
       console.error(err)
     }

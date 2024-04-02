@@ -5,80 +5,69 @@ import TransactionForm from '@/components/TransactionForm.vue'
 import type { BalancePropsType } from '@/components/BalanceComponent.vue'
 import HistoryExpenses from '@/components/HistoryExpenses.vue'
 import { Currency, ExpensesType } from '@/enums'
-import type { HistoryExpensesPropsType } from '../components/HistoryExpenses.vue'
 import BasicLayout from '@/layouts/basic-layout.vue'
 import useGetUserData from '@/composables/useGetUserData'
+import { useTransactionStore } from '../stores/supabase-client'
+import { ref, watch } from 'vue'
+import type { TransactionType } from '@/types'
 
-const balanceData: BalancePropsType = {
-  currency: Currency.IDR,
-  total_expense: 12000,
-  total_income: 20000
+const balanceData = ref<BalancePropsType | null>(null)
+const rowDataTransaction = ref<TransactionType[] | null>(null)
+
+const { currency, registerd_user_id } = useGetUserData()
+const useTransaction = useTransactionStore()
+
+watch(
+  [registerd_user_id, currency],
+  (curr) => {
+    fetchAmountBalance(Number(curr[0]))
+    fetchListTransaction(Number(curr[0]))
+  },
+  { immediate: true }
+)
+
+async function refetchAll() {
+  fetchAmountBalance(Number(registerd_user_id.value))
+  fetchListTransaction(Number(registerd_user_id.value))
 }
 
-const historyExpensesData: HistoryExpensesPropsType[] = [
-  {
-    amount: 12000,
-    createdAt: new Date(),
-    currencySymbol: Currency.IDR,
-    expensesType: ExpensesType.EXPENSE,
-    id: '123',
-    titleTransaction: 'Artha UI'
-  },
-  {
-    amount: 13000,
-    createdAt: new Date(),
-    currencySymbol: Currency.IDR,
-    expensesType: ExpensesType.INCOME,
-    id: '234',
-    titleTransaction: 'Beli Madu'
-  },
-  {
-    amount: 12000,
-    createdAt: new Date(),
-    currencySymbol: Currency.IDR,
-    expensesType: ExpensesType.EXPENSE,
-    id: '123',
-    titleTransaction: 'Artha UI'
-  },
-  {
-    amount: 13000,
-    createdAt: new Date(),
-    currencySymbol: Currency.IDR,
-    expensesType: ExpensesType.INCOME,
-    id: '234',
-    titleTransaction: 'Beli Madu'
-  },
-  {
-    amount: 12000,
-    createdAt: new Date(),
-    currencySymbol: Currency.IDR,
-    expensesType: ExpensesType.EXPENSE,
-    id: '123',
-    titleTransaction: 'Artha UI'
-  },
-  {
-    amount: 13000,
-    createdAt: new Date(),
-    currencySymbol: Currency.IDR,
-    expensesType: ExpensesType.INCOME,
-    id: '234',
-    titleTransaction: 'Beli Madu'
+async function fetchAmountBalance(registeredId: number) {
+  const { errorSumTransaction, sumTransaction } =
+    await useTransaction.selectAllTransaction(registeredId)
+  if (errorSumTransaction) {
+    console.error(errorSumTransaction)
+    return
   }
-]
+  balanceData.value = {
+    currency: Currency[currency.value as Currency],
+    total_expense: sumTransaction.find((el: any) => el.expenses_type === ExpensesType.EXPENSE)
+      .total_sum,
+    total_income: sumTransaction.find((el: any) => el.expenses_type === ExpensesType.INCOME)
+      .total_sum
+  }
+}
 
-const { currency, user_id, registerd_user_id } = useGetUserData()
+async function fetchListTransaction(registeredId: number) {
+  const { rowTransaction, errorTransaction } =
+    await useTransaction.selectAllTransaction(registeredId)
+  if (errorTransaction) {
+    return console.error(errorTransaction)
+  }
+  rowDataTransaction.value = rowTransaction
+}
 </script>
 
 <template>
   <BasicLayout>
-    {{ currency }}
-    {{ user_id }}
-    {{ registerd_user_id }}
     <main class="flex flex-col gap-y-5">
       <HeadingComponent />
-      <BalanceComponent :balance-data="balanceData" />
-      <HistoryExpenses :expenses-data-list="historyExpensesData" />
-      <TransactionForm :user-registered-id="Number(registerd_user_id)" />
+      <BalanceComponent v-if="balanceData" :balance-data="balanceData" />
+      <HistoryExpenses
+        v-if="rowDataTransaction"
+        :currency="Currency[currency as Currency]"
+        :row-data-transaction="rowDataTransaction"
+      />
+      <TransactionForm :user-registered-id="Number(registerd_user_id)" @refetch="refetchAll" />
     </main>
   </BasicLayout>
 </template>

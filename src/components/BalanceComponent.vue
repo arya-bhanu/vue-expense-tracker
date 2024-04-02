@@ -4,7 +4,7 @@
       <h3 class="text-xl font-semibold">YOUR BALANCE</h3>
       <h1 class="flex items-center text-4xl font-semibold">
         <span>{{ currencySymbol }}</span>
-        <span>{{ balanceData.total_income - balanceData.total_expense }}</span>
+        <span>{{ totalBalance }}</span>
       </h1>
     </div>
     <div class="flex items-center py-5 px-4 gap-x-5 divide-x-2 bg-white shadow-lg mt-5">
@@ -22,6 +22,7 @@
 <script setup lang="ts">
 import { Currency } from '../enums'
 import usePickCurrency from '../composables/usePickCurrency'
+import { computed } from 'vue'
 export type BalancePropsType = {
   total_income: number
   total_expense: number
@@ -29,6 +30,9 @@ export type BalancePropsType = {
 }
 const props = defineProps<{ balanceData: BalancePropsType }>()
 const currencySymbol = usePickCurrency(props.balanceData.currency)
+const totalBalance = computed(
+  () => props.balanceData.total_expense + props.balanceData.total_income
+)
 </script>
 
 <style scoped lang="postcss">
