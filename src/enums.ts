@@ -4,8 +4,8 @@ enum Currency {
 }
 
 enum ExpensesType {
-  INCOME,
-  EXPENSE
+  INCOME = 'INCOME',
+  EXPENSE = 'EXPENSE'
 }
 
 export { Currency, ExpensesType }

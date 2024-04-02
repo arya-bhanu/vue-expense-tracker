@@ -8,8 +8,7 @@
       @click="
         async () => {
           try {
-            const { data, error } = await signInUser()
-            console.log(data)
+            const { error } = await signInUser()
             if (error) throw error
           } catch (err) {
             console.error(err)

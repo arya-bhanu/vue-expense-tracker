@@ -10,7 +10,26 @@ const router = createRouter({
     {
       path: '/tracker',
       name: 'home',
-      component: HomeView
+      component: HomeView,
+      async beforeEnter() {
+        const useAuth = useAuthStore()
+        const { data, error } = await useAuth.getUser()
+        if (error || !data.user?.id) {
+          router.push({ name: 'home' })
+          return
+        }
+        const { data: dataCheck, error: errorCheck } = await useAuth.checkRegisteredUser(
+          data.user?.id
+        )
+        if (dataCheck && dataCheck.length === 0) {
+          router.replace({ name: 'registration' })
+          return
+        }
+        if (errorCheck || !dataCheck) {
+          router.replace({ name: 'welcome' })
+          return
+        }
+      }
     },
     {
       path: '/registration',
