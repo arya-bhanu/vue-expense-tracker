@@ -12,7 +12,7 @@ import { ref, watch } from 'vue'
 import type { TransactionType } from '@/types'
 
 const balanceData = ref<BalancePropsType | null>(null)
-const rowDataTransaction = ref<TransactionType[] | null>(null)
+const rowDataTransaction = ref<TransactionType[] | null>([])
 
 const { currency, registerd_user_id } = useGetUserData()
 const useTransaction = useTransactionStore()
@@ -40,10 +40,10 @@ async function fetchAmountBalance(registeredId: number) {
   }
   balanceData.value = {
     currency: Currency[currency.value as Currency],
-    total_expense: sumTransaction.find((el: any) => el.expenses_type === ExpensesType.EXPENSE)
-      .total_sum,
-    total_income: sumTransaction.find((el: any) => el.expenses_type === ExpensesType.INCOME)
-      .total_sum
+    total_expense:
+      sumTransaction.find((el: any) => el.expenses_type === ExpensesType.EXPENSE)?.total_sum || 0,
+    total_income:
+      sumTransaction.find((el: any) => el.expenses_type === ExpensesType.INCOME)?.total_sum || 0
   }
 }
 
@@ -63,7 +63,7 @@ async function fetchListTransaction(registeredId: number) {
       <HeadingComponent />
       <BalanceComponent v-if="balanceData" :balance-data="balanceData" />
       <HistoryExpenses
-        v-if="rowDataTransaction"
+        v-if="rowDataTransaction && currency"
         :currency="Currency[currency as Currency]"
         :row-data-transaction="rowDataTransaction"
       />

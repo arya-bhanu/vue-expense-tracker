@@ -3,7 +3,7 @@ import { ref } from 'vue'
 
 export default () => {
   const user_id = ref('')
-  const currency = ref('')
+  const currency = ref()
   const registerd_user_id = ref('')
   const useAuth = useAuthStore()
 

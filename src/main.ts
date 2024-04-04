@@ -4,9 +4,9 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { OhVueIcon, addIcons } from 'oh-vue-icons'
 
-import { FcGoogle } from 'oh-vue-icons/icons'
+import { FcGoogle, BiEyeFill } from 'oh-vue-icons/icons'
 
-addIcons(FcGoogle)
+addIcons(FcGoogle, BiEyeFill)
 
 import App from './App.vue'
 import router from './router'
