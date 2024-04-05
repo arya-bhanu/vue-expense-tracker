@@ -36,17 +36,18 @@
 </template>
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useTransactionStore } from '../stores/supabase-client'
+import { useStorageStore, useTransactionStore } from '../stores/supabase-client'
 import { ExpensesType } from '@/enums'
 
 const props = defineProps<{ userRegisteredId: number }>()
 const emits = defineEmits<{ (e: 'refetch'): void }>()
 
 const useTransaction = useTransactionStore()
+const useStorage = useStorageStore()
 
 const textModel = ref('')
 const amountModel = ref(0)
-const imgModel = ref<string | null>(null)
+const imgModel = ref<File | null>(null)
 
 const calculateExpenseType = computed(() => {
   if (amountModel.value > 0) {
@@ -57,24 +58,42 @@ const calculateExpenseType = computed(() => {
 })
 
 function handleImageChange(e: Event) {
-  const url = (e.target as HTMLInputElement).value
-  imgModel.value = url
+  const img = (e.target as HTMLInputElement).files
+  if (img) {
+    imgModel.value = img[0]
+  }
 }
 async function handleFormSubmit() {
   if (textModel.value && amountModel.value !== 0) {
     try {
-      const error = await useTransaction.createTransaction(
-        props.userRegisteredId,
-        textModel.value,
-        amountModel.value,
-        calculateExpenseType.value
-      )
-      if (error) throw error
+      let uploadedImage
+      if (imgModel.value) {
+        uploadedImage = await useStorage.uploadImage(createImgPathname(), imgModel.value)
+        if (uploadedImage.data) {
+          const signedUrl = await useStorage.getSignedUrl(uploadedImage.data.path)
+          console.log(signedUrl)
+        }
+      }
+
+      console.log(uploadedImage)
+
+      // const error = await useTransaction.createTransaction(
+      //   props.userRegisteredId,
+      //   textModel.value,
+      //   amountModel.value,
+      //   calculateExpenseType.value
+      // )
+
+      // if (error) throw error
       emits('refetch')
     } catch (err) {
       console.error(err)
     }
   }
+}
+
+function createImgPathname() {
+  return `file_transaction_${props.userRegisteredId}_${new Date().getTime()}`
 }
 </script>
 <style scoped lang="postcss">

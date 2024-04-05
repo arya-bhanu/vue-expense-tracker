@@ -35,13 +35,19 @@ export const useAuthStore = defineStore('auth', () => {
 })
 
 export const useStorageStore = defineStore('storage', () => {
-  const uploadImage = async (path: string, fileBody: any) => {
+  const uploadImage = async (path: string, fileBody: File) => {
     const { data, error } = await supabase.storage
       .from('expenses-image')
       .upload(path, fileBody, { contentType: 'image/*' })
     return { data, error }
   }
-  return { uploadImage }
+  const getSignedUrl = async (path: string) => {
+    const { data, error } = await supabase.storage
+      .from('expenses-image')
+      .createSignedUrl(path, 60 * 60 * 24)
+    return { data, error }
+  }
+  return { uploadImage, getSignedUrl }
 })
 
 export const useTransactionStore = defineStore('transaction', () => {
