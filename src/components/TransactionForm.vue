@@ -12,6 +12,7 @@
           <span>(negative - expense, positive - income)</span>
         </label>
         <input
+          ref="input_file"
           v-model="amountModel"
           required
           id="amount"
@@ -38,6 +39,7 @@
 import { computed, ref } from 'vue'
 import { useStorageStore, useTransactionStore } from '../stores/supabase-client'
 import { ExpensesType } from '@/enums'
+import useCreatePathname from '@/composables/useCreatePathname'
 
 const props = defineProps<{ userRegisteredId: number }>()
 const emits = defineEmits<{ (e: 'refetch'): void }>()
@@ -48,6 +50,8 @@ const useStorage = useStorageStore()
 const textModel = ref('')
 const amountModel = ref(0)
 const imgModel = ref<File | null>(null)
+
+const input_file = ref(null)
 
 const calculateExpenseType = computed(() => {
   if (amountModel.value > 0) {
@@ -66,34 +70,36 @@ function handleImageChange(e: Event) {
 async function handleFormSubmit() {
   if (textModel.value && amountModel.value !== 0) {
     try {
-      let uploadedImage
+      let uploadedImageid = undefined
       if (imgModel.value) {
-        uploadedImage = await useStorage.uploadImage(createImgPathname(), imgModel.value)
+        const uploadedImage = await useStorage.uploadImage(
+          useCreatePathname(props.userRegisteredId),
+          imgModel.value
+        )
         if (uploadedImage.data) {
-          const signedUrl = await useStorage.getSignedUrl(uploadedImage.data.path)
-          console.log(signedUrl)
+          uploadedImageid = uploadedImage.data.path
+        } else {
+          throw new Error('Failed upload file image')
         }
       }
 
-      console.log(uploadedImage)
+      await useTransaction.createTransaction(
+        props.userRegisteredId,
+        textModel.value,
+        amountModel.value,
+        calculateExpenseType.value,
+        uploadedImageid
+      )
 
-      // const error = await useTransaction.createTransaction(
-      //   props.userRegisteredId,
-      //   textModel.value,
-      //   amountModel.value,
-      //   calculateExpenseType.value
-      // )
+      textModel.value = ''
+      amountModel.value = 0
+      imgModel.value = null
 
-      // if (error) throw error
       emits('refetch')
     } catch (err) {
       console.error(err)
     }
   }
-}
-
-function createImgPathname() {
-  return `file_transaction_${props.userRegisteredId}_${new Date().getTime()}`
 }
 </script>
 <style scoped lang="postcss">

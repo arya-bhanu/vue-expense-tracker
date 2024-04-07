@@ -51,6 +51,24 @@ export const useStorageStore = defineStore('storage', () => {
 })
 
 export const useTransactionStore = defineStore('transaction', () => {
+  const updateTransaction = async (
+    id: number,
+    titleTransaction: string,
+    amount: number,
+    expensesType: string,
+    imgUrl?: string
+  ) => {
+    const { error } = await supabase
+      .from('transaction_user')
+      .update({
+        title_transaction: titleTransaction,
+        amount,
+        expenses_type: expensesType,
+        img_url: imgUrl
+      })
+      .eq('id', id)
+    return error
+  }
   const createTransaction = async (
     userDataId: number,
     titleTransaction: string,
@@ -81,5 +99,5 @@ export const useTransactionStore = defineStore('transaction', () => {
     )
     return { rowTransaction, errorTransaction, sumTransaction, errorSumTransaction }
   }
-  return { createTransaction, selectAllTransaction }
+  return { createTransaction, selectAllTransaction, updateTransaction }
 })

@@ -8,7 +8,7 @@ import { Currency, ExpensesType } from '@/enums'
 import BasicLayout from '@/layouts/basic-layout.vue'
 import useGetUserData from '@/composables/useGetUserData'
 import { useTransactionStore } from '../stores/supabase-client'
-import { ref, watch } from 'vue'
+import { provide, ref, watch } from 'vue'
 import type { TransactionType } from '@/types'
 
 const balanceData = ref<BalancePropsType | null>(null)
@@ -29,6 +29,7 @@ watch(
 async function refetchAll() {
   fetchAmountBalance(Number(registerd_user_id.value))
   fetchListTransaction(Number(registerd_user_id.value))
+  console.log('refetch called')
 }
 
 async function fetchAmountBalance(registeredId: number) {
@@ -55,6 +56,9 @@ async function fetchListTransaction(registeredId: number) {
   }
   rowDataTransaction.value = rowTransaction
 }
+
+provide('user_registered_id', registerd_user_id)
+provide('refetch', refetchAll)
 </script>
 
 <template>
