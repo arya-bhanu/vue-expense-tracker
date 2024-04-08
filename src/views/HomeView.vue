@@ -29,7 +29,6 @@ watch(
 async function refetchAll() {
   fetchAmountBalance(Number(registerd_user_id.value))
   fetchListTransaction(Number(registerd_user_id.value))
-  console.log('refetch called')
 }
 
 async function fetchAmountBalance(registeredId: number) {

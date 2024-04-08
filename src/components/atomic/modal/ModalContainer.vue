@@ -5,18 +5,22 @@
         <Transition ref="modal">
           <div
             v-if="isActive"
-            class="min-h-[45vh] p-4 flex md:min-h-[50vh] w-full md:w-fit min-w-[50vw] z-30 bg-white fixed top-[50%] -translate-y-[50%] left-[50%] -translate-x-[50%]"
+            class="max-h-[80vh] overflow-auto fixed top-[50%] -translate-y-[50%] left-[50%] -translate-x-[50%] z-30"
           >
-            <div class="w-full flex min-h-full flex-col items-center justify-center">
-              <div class="m-auto">
-                <slot></slot>
+            <div
+              class="min-h-[45vh] bg-white py-3 p-4 flex md:min-h-[50vh] w-full md:w-fit min-w-[50vw]"
+            >
+              <div class="w-full min-h-full">
+                <div>
+                  <slot></slot>
+                </div>
+                <button
+                  class="bg-red-500 w-full my-3 md:w-fit block ml-0 md:ml-auto hover:bg-red-600 text-white rounded-md px-3 py-1.5"
+                  @click="emits('click-modal', false)"
+                >
+                  Close
+                </button>
               </div>
-              <button
-                class="bg-red-500 w-full md:w-fit block ml-0 md:ml-auto hover:bg-red-600 text-white rounded-md px-3 py-1.5"
-                @click="emits('click-modal', false)"
-              >
-                Close
-              </button>
             </div>
           </div>
         </Transition>

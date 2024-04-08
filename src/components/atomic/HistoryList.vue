@@ -18,7 +18,7 @@
       <button @click="() => (isActive = !isActive)">
         <v-icon name="bi-eye-fill" class="text-cyan-600 hover:text-cyan-800" scale="1.3" />
       </button>
-      <button>
+      <button @click="() => (isActiveModalEdit = !isActiveModalEdit)">
         <v-icon name="fa-edit" class="text-cyan-600 hover:text-cyan-800" scale="1.3" />
       </button>
     </div>
@@ -48,6 +48,15 @@
         </div>
       </div>
     </ModalContainer>
+    <ModalContainer :is-active="isActiveModalEdit" @click-modal="handleClickModalEdit">
+      <FormEdit
+        :id="historyListData.id"
+        :default-text="historyListData.title_transaction"
+        :default-amount="historyListData.amount"
+        :default-img-url="historyListData.img_url"
+        @set-modal-false="setActiveModalFalse"
+      />
+    </ModalContainer>
   </li>
 </template>
 <script setup lang="ts">
@@ -58,6 +67,7 @@ import { inject, ref } from 'vue'
 import ShowImage from './modal/ShowImage.vue'
 import useCreatePathname from '@/composables/useCreatePathname'
 import { useStorageStore, useTransactionStore } from '@/stores/supabase-client'
+import FormEdit from './FormEdit.vue'
 
 const useStorage = useStorageStore()
 const useTransaction = useTransactionStore()
@@ -66,12 +76,17 @@ const props = defineProps<{ historyListData: any; currency: Currency }>()
 const currencySymbol = usePickCurrency(props.currency)
 
 const isActive = ref(false)
+const isActiveModalEdit = ref(false)
 const imgModel = ref<File | null>(null)
 const userRegisteredId = inject('user_registered_id')
 const refetch = inject('refetch')
 
 function handleClickModal(val: boolean) {
   isActive.value = val
+}
+
+function handleClickModalEdit(val: boolean) {
+  isActiveModalEdit.value = val
 }
 
 function handleImageChange(e: Event) {
@@ -84,8 +99,6 @@ function handleImageChange(e: Event) {
 async function handleImageUpload() {
   try {
     if (imgModel.value && (userRegisteredId as unknown as any).value) {
-      console.log(userRegisteredId)
-      console.log(imgModel.value)
       const { data: uploadedImage, error } = await useStorage.uploadImage(
         useCreatePathname((userRegisteredId as any).value as number),
         imgModel.value
@@ -109,5 +122,9 @@ async function handleImageUpload() {
   } catch (err) {
     console.error(err)
   }
+}
+
+function setActiveModalFalse() {
+  isActiveModalEdit.value = false
 }
 </script>
