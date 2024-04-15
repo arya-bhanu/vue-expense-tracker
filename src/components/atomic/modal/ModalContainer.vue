@@ -10,8 +10,8 @@
             <div
               class="min-h-[45vh] bg-white py-3 p-4 flex md:min-h-[50vh] w-full md:w-fit min-w-[50vw]"
             >
-              <div class="w-full min-h-full">
-                <div>
+              <div class="w-full min-h-full flex flex-col justify-between">
+                <div class="flex-1">
                   <slot></slot>
                 </div>
                 <button

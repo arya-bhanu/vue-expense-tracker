@@ -23,7 +23,7 @@
       </button>
     </div>
     <ModalContainer :is-active="isActive" @click-modal="handleClickModal">
-      <div>
+      <div class="h-full flex flex-col justify-center">
         <div v-if="!historyListData.img_url">
           <p class="text-center text-lg font-semibold">Your image transaction is empty</p>
           <form class="flex flex-col items-center my-3" @submit.prevent="handleImageUpload">
